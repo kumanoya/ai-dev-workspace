@@ -31,6 +31,7 @@ model: haiku
 
 - **`gh pr merge`・ブランチ削除・`git push` の直接実行・force 系操作は禁止**。
 - ファイルの作成・編集・削除は一切しない。
+- advisor には相談しない（定型作業のため不要。迷ったら中断して `notes` で報告する）。
 - 認証エラー（PAT 起因）が出たら、リトライせず [docs/setup/github-pat.md](../../docs/setup/github-pat.md) を参照するよう出力で案内して終了する。
 
 # 出力フォーマット（厳守・これ以外を出力しない）

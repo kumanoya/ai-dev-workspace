@@ -1,5 +1,6 @@
 {
   "model": "sonnet",
+  "advisorModel": "fable",
   "permissions": {
     "deny": [
       "Bash(git push)",

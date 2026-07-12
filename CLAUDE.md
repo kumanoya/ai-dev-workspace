@@ -73,7 +73,9 @@ Figma のデザインを `plugin:figma:figma` MCP 経由で読み取り、`proto
   - 実装作業の区切りでの自律コミット → **committer サブエージェント**（Haiku）へ委譲する
 - PR 作成は `/create-pr` を使う（pr-creator サブエージェント（Haiku）に委譲）
 
-モデルの使い分け・コスト運用ルールは [docs/ai-cost-optimization.md](docs/ai-cost-optimization.md) を参照（定型作業 = Haiku、実装 = Sonnet 既定、複雑判断のみ `/model opus` へ明示エスカレーション）。
+モデルの使い分け・コスト運用ルールは [docs/ai-cost-optimization.md](docs/ai-cost-optimization.md) を参照（定型作業 = Haiku、実装 = Sonnet 既定、難所の判断は advisor（Fable、`.claude/settings.json` の `advisorModel` で設定済み）が自動補佐、長時間自律ランのみ `/model fable` へ明示切替）。
+
+advisor の発動ルール: 同一エラー・同一指摘が2回続いたとき、または解決の道筋が立たないときは、試行を重ねる前に advisor に相談する。相談しても解消しなければ続行せず人間に報告する（方針確定前・完了宣言前の予防的な相談はモデルの裁量に任せる）。
 
 ---
 
