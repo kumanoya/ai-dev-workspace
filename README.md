@@ -2,6 +2,8 @@
 
 プロジェクト概要・技術スタック・ディレクトリ構成は [CLAUDE.md](CLAUDE.md) を参照。
 
+チームに参加したらまず [docs/onboarding.md](docs/onboarding.md)（全体マップ・AI 駆動開発の指針・コスト方針）を読むこと。
+
 ## Dev Container で開発を始める
 
 推奨環境は VS Code + Dev Containers 拡張機能（`ms-vscode-remote.remote-containers`）。コンテナランタイムは [OrbStack](https://orbstack.dev/) を使用。
