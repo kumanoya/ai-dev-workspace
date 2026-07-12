@@ -1,0 +1,34 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # ベースイメージの ubuntu(1000)/pwuser(1001) と衝突しない値
+        USER_UID: "1002"
+        USER_GID: "1002"
+    # container_name は指定しない（コピー先のディレクトリ名から自動命名され、環境間で衝突しない）
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:cached
+      - claude-code-home:/home/dev/.claude     # Claude Code 認証・設定（全環境で共有。初回は docker volume create が必要）
+      - gh-config-shared:/home/dev/.config/gh  # gh auth login の永続化（同上）
+      - ssh-config-shared:/home/dev/.ssh       # コンテナ専用 SSH 鍵の永続化（同上。ホストの鍵とは別に発行する）
+      - ${HOME}/.gitconfig:/home/dev/.gitconfig:ro  # ホストのgit user.name/user.emailを引き継ぐ（読み取り専用）
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}   # 使う場合のみ .env に設定（任意。未設定ならコンテナ内でOAuthログイン）
+    # ports:
+    #   - "5173:5173"   # dev サーバー等が必要になったら開ける
+    tty: true
+    stdin_open: true
+    command: ["sleep", "infinity"]
+
+volumes:
+  # 全環境（親リポジトリ・テンプレコピー先・claude-sandbox）で共有する固定名 volume。
+  # 初回のみ: docker volume create claude-code-home gh-config-shared ssh-config-shared
+  claude-code-home:
+    external: true
+  gh-config-shared:
+    external: true
+  ssh-config-shared:
+    external: true

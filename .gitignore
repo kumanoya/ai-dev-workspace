@@ -1,0 +1,48 @@
+# Node / パッケージ管理
+node_modules/
+**/node_modules/
+.pnpm-store/
+
+# ビルド成果物
+dist/
+dist-ssr/
+**/dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# Playwright / E2E
+test-results/
+playwright-report/
+playwright/.cache/
+blob-report/
+verify/shots/
+
+# Claude Code（個人ローカル上書き・資格情報）
+.claude/settings.local.json
+.claude/.credentials.json
+
+# 環境変数・秘密情報
+.env
+.env.*
+!.env.example
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# エディタ
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# ログ
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+/temp
+
+# セッション引き継ぎメモ（/handoff の書き出し先。git に残す情報は specs/ とコミットが担う）
+/tmp/

@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+# 使い捨てサンドボックスコンテナの管理（ホスト macOS で実行する）。
+# 運用ポリシー・初回セットアップは docs/setup/sandbox.md を参照。
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "$(readlink -f "$0" 2>/dev/null || echo "$0")")/.." && pwd)"
+TEMPLATE_DIR="${REPO_ROOT}/templates/ai-sandbox"
+SANDBOX_DIR="${CLAUDE_SANDBOX_DIR:-$HOME/sandboxes}"
+IMAGE="claude-sandbox:latest"
+LABEL="claude-sandbox=1"
+
+usage() {
+  cat <<'EOF'
+使い方: claude-sandbox <コマンド|名前>
+
+  <name>          サンドボックスを作成して claude を起動（既存なら再接続）
+  ls              サンドボックス一覧
+  shell <name>    bash で入る
+  rm <name>       コンテナを破棄（~/sandboxes/<name> のコードは残る）
+  build           テンプレートからイメージを再ビルド
+
+ワークスペースの場所は環境変数 CLAUDE_SANDBOX_DIR で変更できる（既定: ~/sandboxes）
+EOF
+}
+
+build_image() {
+  echo "==> ${IMAGE} をビルド中（${TEMPLATE_DIR}）..."
+  docker build -t "${IMAGE}" "${TEMPLATE_DIR}"
+}
+
+ensure_prereqs() {
+  # 冪等: 既にあれば何もしない
+  docker volume create claude-code-home >/dev/null
+  docker volume create gh-config-shared >/dev/null
+  docker volume create ssh-config-shared >/dev/null
+  if ! docker image inspect "${IMAGE}" >/dev/null 2>&1; then
+    build_image
+  fi
+}
+
+container_name() {
+  echo "sbx-$1"
+}
+
+validate_name() {
+  if [[ ! "$1" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
+    echo "エラー: 名前は小文字英数字とハイフンのみ（例: try-hono-rpc）: $1" >&2
+    exit 1
+  fi
+}
+
+attach() {
+  local name="$1" cname
+  cname="$(container_name "${name}")"
+  if [ "$(docker inspect -f '{{.State.Running}}' "${cname}")" != "true" ]; then
+    docker start "${cname}" >/dev/null
+  fi
+  exec docker exec -it "${cname}" claude
+}
+
+create_and_attach() {
+  local name="$1" cname
+  cname="$(container_name "${name}")"
+  if docker container inspect "${cname}" >/dev/null 2>&1; then
+    echo "==> 既存のサンドボックス ${name} に再接続します"
+    attach "${name}"
+  fi
+  ensure_prereqs
+  mkdir -p "${SANDBOX_DIR}/${name}"
+  echo "==> サンドボックス ${name} を作成中（workspace: ${SANDBOX_DIR}/${name}）..."
+  docker run -d \
+    --name "${cname}" \
+    --label "${LABEL}" \
+    -v claude-code-home:/home/dev/.claude \
+    -v gh-config-shared:/home/dev/.config/gh \
+    -v ssh-config-shared:/home/dev/.ssh \
+    -v "${SANDBOX_DIR}/${name}":/workspace \
+    -v "${HOME}/.gitconfig":/home/dev/.gitconfig:ro \
+    "${IMAGE}" sleep infinity >/dev/null
+  attach "${name}"
+}
+
+cmd="${1:-}"
+case "${cmd}" in
+  "" | -h | --help)
+    usage
+    ;;
+  ls)
+    docker ps -a --filter "label=${LABEL}" \
+      --format 'table {{.Names}}\t{{.Status}}\t{{.RunningFor}}'
+    ;;
+  shell)
+    name="${2:?名前を指定して: claude-sandbox shell <name>}"
+    cname="$(container_name "${name}")"
+    if [ "$(docker inspect -f '{{.State.Running}}' "${cname}")" != "true" ]; then
+      docker start "${cname}" >/dev/null
+    fi
+    exec docker exec -it "${cname}" bash
+    ;;
+  rm)
+    name="${2:?名前を指定して: claude-sandbox rm <name>}"
+    docker rm -f "$(container_name "${name}")" >/dev/null
+    echo "==> コンテナを破棄した。コードは ${SANDBOX_DIR}/${name} に残っている"
+    ;;
+  build)
+    build_image
+    ;;
+  *)
+    validate_name "${cmd}"
+    create_and_attach "${cmd}"
+    ;;
+esac

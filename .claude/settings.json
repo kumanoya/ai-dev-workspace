@@ -1,0 +1,20 @@
+{
+  "model": "sonnet",
+  "permissions": {
+    "deny": [
+      "Bash(git push)",
+      "Bash(git push:*)",
+      "Bash(gh repo delete:*)",
+      "Bash(gh repo transfer:*)",
+      "Bash(gh repo archive:*)",
+      "Bash(gh secret set:*)",
+      "Bash(gh secret delete:*)",
+      "Bash(gh variable set:*)",
+      "Bash(gh variable delete:*)",
+      "Bash(gh pr merge:*)",
+      "Bash(gh pr close:*)",
+      "Bash(gh api --method DELETE:*)",
+      "Bash(gh api -X DELETE:*)"
+    ]
+  }
+}

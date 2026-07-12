@@ -1,0 +1,35 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # ベースイメージの ubuntu(1000)/pwuser(1001) と衝突しない値
+        USER_UID: "1002"
+        USER_GID: "1002"
+    container_name: ai-dev-workspace
+    working_dir: /workspace
+    volumes:
+      - .:/workspace:cached
+      - claude-code-home:/home/dev/.claude     # Claude Code 認証・設定（サンドボックス等の全環境で共有。ホストの~/.claudeとは別）
+      - gh-config-shared:/home/dev/.config/gh  # gh auth login の永続化（同上）
+      - ssh-config-shared:/home/dev/.ssh       # コンテナ専用 SSH 鍵の永続化（同上。ホストの鍵とは別に発行する）
+      - ${HOME}/.gitconfig:/home/dev/.gitconfig:ro  # ホストのgit user.name/user.emailを引き継ぐ（読み取り専用）
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}   # 使う場合のみ .env に設定（任意。未設定ならコンテナ内でOAuthログイン）
+    ports:
+      - "5172:5172"   # prototypes/sample-app (v1) 用（将来追加）
+      - "5175:5175"   # prototypes/sample-app-v2 (v2) 用（将来追加）
+    tty: true
+    stdin_open: true
+    command: ["sleep", "infinity"]
+
+volumes:
+  # 全環境（本リポジトリ・templates/ai-sandbox のコピー先・claude-sandbox）で共有する固定名 volume。
+  # 初回は docker volume create と旧 volume からのコピーが必要（docs/setup/sandbox.md 参照）。
+  claude-code-home:
+    external: true
+  gh-config-shared:
+    external: true
+  ssh-config-shared:
+    external: true

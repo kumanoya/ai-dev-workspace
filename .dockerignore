@@ -1,0 +1,13 @@
+.git
+node_modules
+**/node_modules
+dist
+**/dist
+.claude/settings.local.json
+.env
+.env.*
+!.env.example
+verify/shots
+test-results
+playwright-report
+.DS_Store

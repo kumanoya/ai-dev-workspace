@@ -1,0 +1,14 @@
+{
+  "name": "ai-sandbox",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "dev",
+  "shutdownAction": "stopCompose",
+  "postCreateCommand": "node --version && pnpm --version && git --version && gh --version && claude --version",
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "streetsidesoftware.code-spell-checker"]
+    }
+  }
+}

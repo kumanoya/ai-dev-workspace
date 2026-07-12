@@ -1,0 +1,36 @@
+{
+  "name": "ai-dev-workspace",
+  "dockerComposeFile": [
+    "../docker-compose.yml"
+  ],
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "dev",
+  "shutdownAction": "stopCompose",
+  "forwardPorts": [
+    5172,
+    5175
+  ],
+  "portsAttributes": {
+    "5172": {
+      "label": "sample-app (v1)",
+      "onAutoForward": "notify"
+    },
+    "5175": {
+      "label": "sample-app-v2 (v2)",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "node --version && pnpm --version && git --version && gh --version && claude --version",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "streetsidesoftware.code-spell-checker"
+      ]
+    }
+  },
+  "containerEnv": {
+    "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0"
+  }
+}
