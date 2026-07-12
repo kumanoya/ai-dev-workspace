@@ -11,7 +11,7 @@
 - 各プロトタイプ配下: `pnpm install` → `pnpm run dev`（v1: 5172 / v2: 5175）
 - `pnpm run build` / `pnpm run lint`（ESLint FlatConfig） / `pnpm run preview`
 - ポート番号は各プロトタイプの `vite.config.ts`（`strictPort: true`）が権威。上記は参考値
-- ルートでの cspell 実行: `pnpm run lint:spell`（設定の権威は `cspell.json`）
+- ルートでの cspell 実行: `pnpm run lint:spell`（設定の権威は `cspell.json`）。スペル修正の運用・トリアージは `/fix-typos`（権威は [.claude/commands/fix-typos.md](.claude/commands/fix-typos.md)）
 
 ## ディレクトリ構造・設計パターン
 
@@ -50,28 +50,18 @@
 
 ---
 
-## Figma MCP 連携ワークフロー
+## Figma MCP 連携
 
-Figma のデザインを `plugin:figma:figma` MCP 経由で読み取り、`prototypes/` 配下に実装する。専用スキル（`/figma-component-library` → `/figma-screen-flow` → `/figma-implement-screen` → `/figma-verify-screen`）を順に使う。read 系ツールのみ使用し、Figma への書き込みはユーザーの明示的な依頼がある場合のみ。詳細な手順・利用制限は [docs/workflows/figma-development.md](docs/workflows/figma-development.md) を参照。
-
----
-
-## スペルチェック（cspell）
-
-人間が VS Code 拡張「Code Spell Checker」で波線に気づき、修正は Claude Code（`/fix-typos`）が担う運用。設定の権威は**ルートの `cspell.json`**、対象は `pnpm run lint:spell`。データ系（mock / dummy / sample）は検査対象外。詳細なトリアージ手順は [.claude/commands/fix-typos.md](.claude/commands/fix-typos.md) を参照。
+Figma の読み取り・実装は専用スキル（`/figma-component-library` → `/figma-screen-flow` → `/figma-implement-screen` → `/figma-verify-screen`）を順に使う（手順・利用制限の権威は各スキル定義）。**Figma MCP は read 系ツールのみ使用し、Figma への書き込みはユーザーの明示的な依頼がある場合のみ。**
 
 ---
 
 ## コミット規約
 
-- **コミットメッセージは日本語**（タイトル・本文ともに。英語のみ不可）
-- `main` への直接コミット禁止。フィーチャーブランチ → PR 経由でマージする
-- **AI は作業の意味的な区切りごとにフィーチャーブランチへコミットしてよい**（人間の指示を待たない）。人間はコミット差分単位で変更をレビューする
-- **push は人間のみ**。`git push` は `.claude/settings.json` の `deny` で技術的にブロック済み（権威は同ファイル）
-- **コミットの実行経路**（手順・メッセージ規約の権威は [.claude/skills/commit/SKILL.md](.claude/skills/commit/SKILL.md)）:
-  - ユーザーの明示的なコミット依頼（`/commit`、「コミットして」等）→ メインセッションが commit スキルの手順で**直接**コミットする（サブエージェントは使わない）
-  - 実装作業の区切りでの自律コミット → **committer サブエージェント**（Haiku）へ委譲する
-- PR 作成は `/create-pr` を使う（pr-creator サブエージェント（Haiku）に委譲）
+- **コミットメッセージは日本語**。`main` への直接コミット禁止（フィーチャーブランチ → PR 経由）
+- **AI は作業の意味的な区切りごとにフィーチャーブランチへコミットしてよい**（人間の指示を待たない）。人間はコミット差分単位でレビューし、**push は人間のみ**（`git push` は `.claude/settings.json` の `deny` でブロック済み）
+- 実行経路: ユーザーの明示依頼 → メインセッションが commit スキルで**直接**、作業区切りの自律コミット → **committer サブエージェント**へ委譲。手順・メッセージ規約の権威は [.claude/skills/commit/SKILL.md](.claude/skills/commit/SKILL.md)
+- PR 作成は `/create-pr` を使う
 
 モデルの使い分け・コスト運用ルールは [docs/ai-cost-optimization.md](docs/ai-cost-optimization.md) を参照（定型作業 = Haiku、実装 = Sonnet 既定、難所の判断は advisor（Fable、`.claude/settings.json` の `advisorModel` で設定済み）が自動補佐、長時間自律ランのみ `/model fable` へ明示切替）。
 
@@ -81,9 +71,7 @@ advisor の発動ルール: 同一エラー・同一指摘が2回続いたとき
 
 ## gh コマンドの安全ガード
 
-破壊的な `gh` コマンド（repo delete/transfer、secret/variable の set・delete、pr merge、branch delete 等）は `.claude/settings.json` の `deny` リストで技術的にブロック済み（権威は同ファイル）。上記操作を依頼された場合も意図と影響範囲を確認してから実行すること。シークレット・環境変数の値は `gh` 経由でなくユーザーに手動実行を促す。
-
-`gh pr create` など PAT が必要なコマンドで認証エラーが出た場合は [docs/setup/github-pat.md](docs/setup/github-pat.md) を参照するようユーザーを促す。
+破壊的な `gh` コマンドは `.claude/settings.json` の `deny` でブロック済み（対象コマンドの列挙は同ファイルが権威）。破壊的操作を依頼された場合は意図と影響範囲を確認してから実行し、シークレット・環境変数の値の設定は `gh` 経由でなくユーザーに手動実行を促す。PAT が必要なコマンドで認証エラーが出た場合はセットアップドキュメントの参照をユーザーに促す。
 
 ## System Persona & Tone
 
