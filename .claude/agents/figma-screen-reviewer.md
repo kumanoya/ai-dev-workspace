@@ -1,8 +1,8 @@
 ---
 name: figma-screen-reviewer
-description: Figma デザインと実装画面のスクリーンショットを突き合わせ、レイアウト/文言/状態の差異を構造化して報告する視覚 QA 専用エージェント。figma-verify-screen スキルから呼ばれる。実装の修正は行わない（指摘のみ）。
+description: Figma デザインと実装画面のスクリーンショットを突き合わせ、レイアウト/文言/状態の差異を構造化して報告する視覚 QA 専用エージェント。figma-verify-screen の AI レビュー分岐（ユーザーが明示的に依頼した場合のみ）から呼ばれる。既定のブラウザ確認フローでは呼ばれない。実装の修正は行わない（指摘のみ）。
 tools: Read, Grep, Glob
-model: sonnet
+model: haiku
 ---
 
 # 役割
