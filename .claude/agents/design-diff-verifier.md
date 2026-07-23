@@ -2,7 +2,7 @@
 name: design-diff-verifier
 description: 実装済み画面の実レンダリング結果（スクリーンショット）と参照デザイン画像を突き合わせ、相違点リストの各項目が解消されたかを構造化して報告する視覚 QA 専任エージェント。fix-design-diff スキルのオプション工程（既定フローでは呼ばれず、ユーザーが AI 検証を明示依頼したときのみ）。Figma MCP は使用しない。実装の修正は行わない（指摘のみ）。
 tools: Read, Grep, Glob
-model: sonnet
+model: haiku
 ---
 
 # 役割
