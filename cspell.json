@@ -1,0 +1,50 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "language": "en",
+  "dictionaries": [
+    "typescript",
+    "node",
+    "npm",
+    "html",
+    "css",
+    "softwareTerms",
+    "companies",
+    "filetypes",
+    "bash",
+    "docker"
+  ],
+  "ignorePaths": [
+    "node_modules/**",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/pnpm-lock.yaml",
+    "**/*.lock",
+    ".git/**",
+    ".pnpm-store/**",
+    "test-results/**",
+    "playwright-report/**",
+    "temp/**",
+    // ダミーデータは辞書を肥大化させ本物のタイポを覆い隠すため、専用ディレクトリごと除外する
+    "**/src/data/**",
+    // ホストの ~/.zshrc からの移植物。zsh 組み込み変数と個人エイリアスの塊で、プロジェクトの語彙ではない
+    ".devcontainer/zshrc",
+    "cspell.json"
+  ],
+  "words": [
+    "dbaeumer",
+    "esac",
+    "frontmatter",
+    "getpixel",
+    "githubcli",
+    "keyrings",
+    "NOPASSWD",
+    "Noto",
+    "oneline",
+    "pipefail",
+    "prereqs",
+    "pwuser",
+    "ultracode"
+  ],
+  "ignoreWords": []
+}
