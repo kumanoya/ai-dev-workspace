@@ -30,7 +30,7 @@ Claude Code × Figma MCP による **AI 駆動のプロトタイプ開発ワー�
 
 権威は [CLAUDE.md](../CLAUDE.md)「コミット規約」と [.claude/skills/commit/SKILL.md](../.claude/skills/commit/SKILL.md)。要点:
 
-- **コミットメッセージは日本語**。`main` 直接コミット禁止、フィーチャーブランチ → PR
+- **メッセージは `<type>: <日本語要約>`**（type は Conventional Commits の標準語彙。`feat` / `fix` / `docs` 等、一覧は commit スキル）。`main` 直接コミット禁止、フィーチャーブランチ → PR
 - **push できるのは人間だけ**。AI の `git push` は設定で技術的にブロック済み
 - AI は作業の意味的な区切りごとに自律コミットしてよい。人間はコミット差分単位でレビューする
 - PR 作成は `/create-pr`、明示的なコミット依頼は `/commit`
@@ -45,7 +45,7 @@ Claude Code × Figma MCP による **AI 駆動のプロトタイプ開発ワー�
 
 | コマンド / スキル | 用途 |
 |---|---|
-| `/commit` | 現在の変更を日本語規約でコミット |
+| `/commit` | 現在の変更をコミット規約に沿ってコミット |
 | `/create-pr` | 現在のブランチから main への PR 作成 |
 | `/fix-typos` | cspell の指摘をトリアージして修正 |
 | `/lint-fix` | ESLint の機械的なエラー修正 |

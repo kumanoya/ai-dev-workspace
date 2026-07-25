@@ -22,7 +22,7 @@ model: haiku
 3. `git log <base>..HEAD --oneline` と `git diff <base>...HEAD --stat` を**各1回**で差分の全体像を掴む。本文作成に必要なファイルだけ個別に diff を見る（全文 diff の一括取得はしない）。
 4. 未コミットの変更が残っていれば PR を作らず中断し、先に `/commit` するよう出力で促す。
 5. `gh pr create` で作成する:
-   - タイトル・本文とも**日本語**。タイトルはコミット規約と同じ `<種別>: <要約>` 形式
+   - タイトル・本文とも**日本語**。タイトルはコミット規約と同じ `<type>: <要約>` 形式（type は commit スキルが権威）
    - 本文: 変更の目的 / 主な変更点（箇条書き） / 確認方法。末尾に `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
    - 本文は heredoc で渡す
    - リモートにブランチが無い場合、`gh pr create` が push を提案・実行することがある。これは許容する（/create-pr の起動自体が人間の確認を意味する）
@@ -40,7 +40,7 @@ model: haiku
 {
   "created": true,
   "url": "https://github.com/owner/repo/pull/123",
-  "title": "追加: ユーザー検索画面の実装",
+  "title": "feat: ユーザー検索画面の実装",
   "base": "main",
   "notes": ""
 }
