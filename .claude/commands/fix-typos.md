@@ -53,3 +53,6 @@ cspell の検出結果を起点に、スペルミスを自律的に解消する�
 - 日本語など非ラテン文字は cspell の対象外。CJK を語として直そうとしない。
 - `cspell.json` を編集したら `words` / `ignoreWords` はアルファベット順を保ち、重複を作らない。辞書は最小限に保ち、不要になった語は消す。
 - このコマンドはコミットしない（差分はユーザーが確認する）。
+
+<!-- cspell:ignore Placefolder Hoverd Desabled folse toggleable -- 本文中の「タイポの例」そのもの。直すと説明が成立しない -->
+

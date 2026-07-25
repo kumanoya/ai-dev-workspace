@@ -1,0 +1,11 @@
+{
+  "name": "ai-dev-workspace",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint:spell": "cspell --no-progress --show-suggestions --dot ."
+  },
+  "devDependencies": {
+    "cspell": "^10.0.1"
+  }
+}

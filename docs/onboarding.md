@@ -104,9 +104,10 @@ advisor は、メインの Sonnet が判断ポイントで自動的に Fable へ
 | 4 | [docs/ai-cost-optimization.md](ai-cost-optimization.md) | コスト運用ルールの権威（モデル選定・キャッシュ・停止条件・検証運用） |
 | 5 | [docs/development-flow.md](development-flow.md) | 開発フローの権威（Issue 紐付け・ブランチ命名・PR 粒度・レビューとマージ） |
 | 随時 | [docs/setup/sandbox.md](setup/sandbox.md) | サンドボックス環境の作り方・運用ポリシー |
+| 随時 | [docs/setup/github-pat.md](setup/github-pat.md) | gh / SSH の認証の切り分けと、PAT が要るときの扱い |
 | 随時 | [docs/report/リードエンジニア向けAI戦略レポート.md](report/リードエンジニア向けAI戦略レポート.md) | 現行方針に至った分析・意思決定の経緯 |
 | 随時 | [docs/report/エグゼクティブAIレポート.md](report/エグゼクティブAIレポート.md) | 経営層向けのコスト構造・ROI 論 |
 | 随時 | [docs/backlog.md](backlog.md) | 着手待ちの既知タスク |
 | 随時 | `.claude/skills/` / `.claude/agents/` の各定義 | 個別スキル・エージェントの手順の権威 |
 
-なお、CLAUDE.md が参照するファイルの一部（`docs/workflows/figma-development.md`、`docs/setup/github-pat.md`、ルートの `cspell.json` 等）は未作成で、[docs/backlog.md](backlog.md) で管理されている。リンク切れに遭遇したら backlog を確認すること。
+リンク切れに遭遇したら [docs/backlog.md](backlog.md) を確認すること。未作成ファイルはそこで管理している。
