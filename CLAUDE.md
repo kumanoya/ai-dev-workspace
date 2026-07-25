@@ -52,7 +52,7 @@
 
 ## Figma MCP 連携
 
-Figma の読み取り・実装は専用スキル（`/figma-component-library` → `/figma-screen-flow` → `/figma-implement-screen` → `/figma-verify-screen`）を順に使う（手順・利用制限の権威は各スキル定義）。**Figma MCP は read 系ツールのみ使用し、Figma への書き込みはユーザーの明示的な依頼がある場合のみ。**
+**Figma MCP は read 系ツールのみ使用し、Figma への書き込みはユーザーの明示的な依頼がある場合のみ。** Figma の読み取り・実装は専用スキル経由で行う（スキルの順序・手順・利用制限の権威は各スキル定義。起動条件は各スキルの description に記載済み）。
 
 ---
 
