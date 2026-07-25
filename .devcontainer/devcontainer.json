@@ -24,6 +24,9 @@
   "postCreateCommand": "node --version && pnpm --version && git --version && gh --version && claude --version",
   "customizations": {
     "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      },
       "extensions": [
         "dbaeumer.vscode-eslint",
         "streetsidesoftware.code-spell-checker"
