@@ -52,16 +52,16 @@
 
 ## Figma MCP 連携
 
-Figma の読み取り・実装は専用スキル（`/figma-component-library` → `/figma-screen-flow` → `/figma-implement-screen` → `/figma-verify-screen`）を順に使う（手順・利用制限の権威は各スキル定義）。**Figma MCP は read 系ツールのみ使用し、Figma への書き込みはユーザーの明示的な依頼がある場合のみ。**
+**Figma MCP は read 系ツールのみ使用し、Figma への書き込みはユーザーの明示的な依頼がある場合のみ。** Figma の読み取り・実装は専用スキル経由で行う（スキルの順序・手順・利用制限の権威は各スキル定義。起動条件は各スキルの description に記載済み）。
 
 ---
 
 ## コミット規約
 
-- **コミットメッセージは日本語**。`main` への直接コミット禁止（フィーチャーブランチ → PR 経由）
-- **AI は作業の意味的な区切りごとにフィーチャーブランチへコミットしてよい**（人間の指示を待たない）。人間はコミット差分単位でレビューし、**push は人間のみ**（`git push` は `.claude/settings.json` の `deny` でブロック済み）
-- 実行経路: ユーザーの明示依頼 → メインセッションが commit スキルで**直接**、作業区切りの自律コミット → **committer サブエージェント**へ委譲。手順・メッセージ規約の権威は [.claude/skills/commit/SKILL.md](.claude/skills/commit/SKILL.md)
-- PR 作成は `/create-pr` を使う
+- **AI は作業の意味的な区切りごとにフィーチャーブランチへ自律的にコミットしてよい**（人間の指示を待たない）。`main` への直接コミット禁止（フィーチャーブランチ → PR 経由）、**push は人間のみ**（`git push` は `.claude/settings.json` の `deny` でブロック済み）
+- コミットは必ず commit スキルの手順に従う（メッセージ規約・実行経路〔メインセッション直接 / committer 委譲〕の権威は [.claude/skills/commit/SKILL.md](.claude/skills/commit/SKILL.md)）。PR 作成は `/create-pr` を使う
+
+## モデル・advisor 運用
 
 モデルの使い分け・コスト運用ルールは [docs/ai-cost-optimization.md](docs/ai-cost-optimization.md) を参照（定型作業 = Haiku、実装 = Sonnet 既定、難所の判断は advisor（Fable、`.claude/settings.json` の `advisorModel` で設定済み）が自動補佐、長時間自律ランのみ `/model fable` へ明示切替）。
 
