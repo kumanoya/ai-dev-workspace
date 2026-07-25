@@ -60,6 +60,7 @@
 
 - **AI は作業の意味的な区切りごとにフィーチャーブランチへ自律的にコミットしてよい**（人間の指示を待たない）。`main` への直接コミット禁止（フィーチャーブランチ → PR 経由）、**push は人間のみ**（`git push` は `.claude/settings.json` の `deny` でブロック済み）
 - コミットは必ず commit スキルの手順に従う（メッセージ規約・実行経路〔メインセッション直接 / committer 委譲〕の権威は [.claude/skills/commit/SKILL.md](.claude/skills/commit/SKILL.md)）。PR 作成は `/create-pr` を使う
+- PR 本文のフォーマットは [.github/pull_request_template.md](.github/pull_request_template.md)、Issue 紐付け・ブランチ命名・PR 粒度を含む開発フロー全体は [docs/development-flow.md](docs/development-flow.md) が権威
 
 ## モデル・advisor 運用
 
