@@ -12,7 +12,8 @@ ARG USER_GID=1002
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        git ripgrep jq ca-certificates curl gnupg sudo zsh \
+        git ripgrep jq ca-certificates curl gnupg sudo \
+        zsh zsh-syntax-highlighting zsh-autosuggestions locales \
     && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
         | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
     && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
@@ -21,6 +22,11 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y --no-install-recommends gh \
     && rm -rf /var/lib/apt/lists/*
+
+# ホスト側のシェル環境に合わせる（日本語ファイル名・メッセージの文字化け回避）。
+RUN locale-gen ja_JP.UTF-8
+ENV LANG=ja_JP.UTF-8 \
+    LC_ALL=ja_JP.UTF-8
 
 # 再現性のため固定。将来 prototypes/ 側の package.json に packageManager を書けば
 # corepack がそちらを自動優先するので競合しない。
@@ -40,7 +46,7 @@ WORKDIR /workspace
 # 認証と設定を claude-code-home volume 1個で完結させる。
 ENV CLAUDE_CONFIG_DIR=/home/${USERNAME}/.claude
 
-# 最小構成の zsh 設定（詳細はホスト側 .zshrc との共有を別途検討）
+# ホストの ~/.zshrc からコンテナで意味を持つ設定を移植したもの（移植の取捨は同ファイル冒頭に記載）
 COPY .devcontainer/zshrc /home/${USERNAME}/.zshrc
 
 # named volume は初回マウント時にイメージ側の既存ディレクトリの所有権を引き継いでコピーする。
