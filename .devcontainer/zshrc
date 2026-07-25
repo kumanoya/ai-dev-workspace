@@ -1,0 +1,32 @@
+# コンテナ用の最小 zsh 設定。
+# 詳細な設定はホスト側 .zshrc との共有方式を別途検討する（現状は意図的に最小構成）。
+
+# 補完・色
+autoload -Uz compinit && compinit
+autoload -Uz colors && colors
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*:default' menu select=1
+
+# ヒストリ
+HISTFILE=~/.zsh_history
+HISTSIZE=100000
+SAVEHIST=100000
+setopt share_history
+setopt hist_ignore_all_dups
+setopt hist_ignore_space
+setopt hist_reduce_blanks
+
+# 基本挙動
+setopt auto_cd
+setopt no_beep
+setopt print_eight_bit
+
+# git ブランチ付きの簡易プロンプト
+autoload -Uz vcs_info
+zstyle ':vcs_info:git:*' formats ' (%b)'
+precmd() { vcs_info }
+setopt prompt_subst
+PROMPT='%F{cyan}%n@%m%f:%F{blue}%~%f%F{green}${vcs_info_msg_0_}%f %# '
+
+# エイリアス（最小限）
+alias ll='ls -la'

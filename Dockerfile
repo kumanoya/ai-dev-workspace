@@ -12,7 +12,7 @@ ARG USER_GID=1002
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        git ripgrep jq ca-certificates curl gnupg sudo \
+        git ripgrep jq ca-certificates curl gnupg sudo zsh \
     && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
         | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
     && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
@@ -30,7 +30,7 @@ RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 RUN npm install -g @anthropic-ai/claude-code
 
 RUN groupadd --gid ${USER_GID} ${USERNAME} \
-    && useradd --uid ${USER_UID} --gid ${USER_GID} -m -s /bin/bash ${USERNAME} \
+    && useradd --uid ${USER_UID} --gid ${USER_GID} -m -s /bin/zsh ${USERNAME} \
     && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} \
     && chmod 0440 /etc/sudoers.d/${USERNAME}
 
@@ -39,6 +39,9 @@ WORKDIR /workspace
 # ~/.claude.json（onboarding 状態・MCP 設定）も volume 内に置かせて、
 # 認証と設定を claude-code-home volume 1個で完結させる。
 ENV CLAUDE_CONFIG_DIR=/home/${USERNAME}/.claude
+
+# 最小構成の zsh 設定（詳細はホスト側 .zshrc との共有を別途検討）
+COPY .devcontainer/zshrc /home/${USERNAME}/.zshrc
 
 # named volume は初回マウント時にイメージ側の既存ディレクトリの所有権を引き継いでコピーする。
 # ここで先に dev 所有のディレクトリを作っておくことで、volume マウント後も dev が書き込める。
