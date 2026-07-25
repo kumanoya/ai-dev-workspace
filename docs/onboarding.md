@@ -13,6 +13,7 @@ Claude Code × Figma MCP による **AI 駆動のプロトタイプ開発ワー�
 - 複数の独立パッケージが並存する構成。ルートは E2E テストツール群、`prototypes/` 配下に個別の React プロトタイプが入る（構成の詳細は [CLAUDE.md](../CLAUDE.md) 参照）
 - **`specs/` が Source of Truth**。Figma から読み取った仕様・デザイントークン・画面構成は specs に永続化し、実装は specs を参照する。「同じ情報を Figma から二度取らない」がコストと品質の両面の基本原則
 - Figma デザインの読み取り → コンポーネント定義 → 画面実装 → 検証、の一連のフローが専用スキル・サブエージェントとして `.claude/` に定義済み
+- Claude Code 設定を GitHub Copilot 用に移植した参照テンプレートを `templates/github-copilot/` に同梱（権威は `.claude/` 側。位置づけ・導入手順は同ディレクトリの README 参照）
 
 ## 2. 環境構築
 
