@@ -28,12 +28,12 @@ Claude Code × Figma MCP による **AI 駆動のプロトタイプ開発ワー�
 
 ### コミット・PR の規約
 
-権威は [CLAUDE.md](../CLAUDE.md)「コミット規約」と [.claude/skills/commit/SKILL.md](../.claude/skills/commit/SKILL.md)。要点:
+Issue からマージまでの流れは [docs/development-flow.md](development-flow.md) が権威。個別の規約は [.claude/skills/commit/SKILL.md](../.claude/skills/commit/SKILL.md)（コミットメッセージ）と [.github/pull_request_template.md](../.github/pull_request_template.md)（PR 本文）を参照。要点:
 
 - **メッセージは `<type>: <日本語要約>`**（type は Conventional Commits の標準語彙。`feat` / `fix` / `docs` 等、一覧は commit スキル）。`main` 直接コミット禁止、フィーチャーブランチ → PR
 - **push できるのは人間だけ**。AI の `git push` は設定で技術的にブロック済み
 - AI は作業の意味的な区切りごとに自律コミットしてよい。人間はコミット差分単位でレビューする
-- PR 作成は `/create-pr`、明示的なコミット依頼は `/commit`
+- PR 作成は `/create-pr`、明示的なコミット依頼は `/commit`。**PR には Issue かチケットを必ず紐付ける**（`/create-pr #12` のように番号を渡す）
 
 ### 安全ガード
 
@@ -102,6 +102,7 @@ advisor は、メインの Sonnet が判断ポイントで自動的に Fable へ
 | 2 | [README.md](../README.md) | Dev Container セットアップ手順 |
 | 3 | [CLAUDE.md](../CLAUDE.md) | Claude Code への指示そのもの。コミット規約・ドキュメント方針・advisor 発動ルールの権威 |
 | 4 | [docs/ai-cost-optimization.md](ai-cost-optimization.md) | コスト運用ルールの権威（モデル選定・キャッシュ・停止条件・検証運用） |
+| 5 | [docs/development-flow.md](development-flow.md) | 開発フローの権威（Issue 紐付け・ブランチ命名・PR 粒度・レビューとマージ） |
 | 随時 | [docs/setup/sandbox.md](setup/sandbox.md) | サンドボックス環境の作り方・運用ポリシー |
 | 随時 | [docs/report/リードエンジニア向けAI戦略レポート.md](report/リードエンジニア向けAI戦略レポート.md) | 現行方針に至った分析・意思決定の経緯 |
 | 随時 | [docs/report/エグゼクティブAIレポート.md](report/エグゼクティブAIレポート.md) | 経営層向けのコスト構造・ROI 論 |
