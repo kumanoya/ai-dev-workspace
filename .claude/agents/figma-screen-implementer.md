@@ -39,7 +39,7 @@ Figma の Dev Mode アノテーション（注釈）は、実装上の**挙動�
    - 多言語・状態管理は第一弾パターン（`useAppState()` / `const t = {...}`）に合わせる。
    - 画面固有のモックデータ・型は `src/data/` `src/types/` に追加する。
 5. **ルーティング接続**: `flowExcerpt` の Routing Map に従い `src/App.tsx` の `<Routes>` に実コンポーネントを接続する。遷移トリガー（ボタン押下→`navigate()`）も配線する。
-6. **検証**: `cd prototypes/<proto> && pnpm run lint` を実行し、パスすることを確認する。
+6. **検証**: `cd prototypes/<proto> && pnpm run lint` を実行し、パスすることを確認する。失敗したら修正して再実行してよいが、**再試行は最大 2 回まで**。それでも通らなければ `lintPassed: false` と残エラー・原因の仮説を返して終了する（推測で直し続けない。同じエラーが 2 回続く時点で原因は仕様・環境側にあることが多い）。
 
 # 制約
 
