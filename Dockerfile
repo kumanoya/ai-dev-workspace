@@ -46,7 +46,9 @@ WORKDIR /workspace
 # 認証と設定を claude-code-home volume 1個で完結させる。
 ENV CLAUDE_CONFIG_DIR=/home/${USERNAME}/.claude
 
-# ホストの ~/.zshrc からコンテナで意味を持つ設定を移植したもの（移植の取捨は同ファイル冒頭に記載）
+# ホストの ~/.zshrc からコンテナで意味を持つ設定を移植したもの。
+# エイリアス・プロンプト・プラグインは対話 TTY でのみ有効（AI エージェントの
+# シェルは素の zsh になる）。移植の取捨とゲートの理由は同ファイル冒頭に記載。
 COPY .devcontainer/zshrc /home/${USERNAME}/.zshrc
 
 # named volume は初回マウント時にイメージ側の既存ディレクトリの所有権を引き継いでコピーする。
