@@ -5,6 +5,23 @@
 # 移植していないもの: Homebrew / fnm / nvm / Volta / Go / macOS 固有の PATH、
 # および docker・podman のエイリアス（コンテナ内に CLI が無いため）。
 # ロケール（LANG / LC_ALL）は Dockerfile の ENV が権威。
+#
+# エイリアス・補完・履歴・プロンプト・プラグインは対話 TTY でのみ読み込む。
+# AI エージェントのシェル（非 TTY）は素の zsh のまま動かす。
+#
+# 理由: エージェントは起動時に .zshrc を shell snapshot へ取り込み、全ツール
+# 呼び出しで再現する。そのため chpwd の ls 出力や ANSI がコマンド出力を汚し、
+# プロンプト関数は COLUMNS=0 でゼロ除算し、エイリアスは権限 deny の文字列
+# マッチ（展開前の文字列を見る）をすり抜ける。
+# =============================================================================
+
+# 非 TTY 向けの最小プロンプト。フック・コマンド置換・ANSI・COLUMNS 依存なし。
+PROMPT='%n@%m %~ %# '
+
+[[ -o interactive && -t 1 ]] || return
+
+# =============================================================================
+# ここから下は対話 TTY 専用
 # =============================================================================
 
 # =============================================================================
@@ -22,6 +39,8 @@ alias hisgrep='history 1 | grep'
 alias sz='source ~/.zshrc'
 
 # エイリアス: git 系
+# push 系のエイリアスは置かない。エージェントのシェルに漏れた場合、権限設定の
+# deny（`git push` の文字列マッチ）を素通りして push できてしまうため。
 alias g='git'
 alias gs='git status'
 alias gb='git branch'
@@ -38,8 +57,6 @@ alias gmod='git merge origin/develop'
 alias gmud='git merge upstream/develop'
 alias gmom='git merge origin/master'
 alias gcm='git commit -m'
-alias gpo='git push origin'
-alias gpom='git push origin master'
 alias gst='git stash'
 alias gsl='git stash list'
 alias gsu='git stash -u'
@@ -141,7 +158,10 @@ function precmd () {
   leftwidth=${#${(S%%)top_left//$~invisible/}}
   rightwidth=${#${(S%%)top_right//$~invisible/}}
 
-  padwidth=$(($COLUMNS - (($leftwidth) + ($rightwidth)) % $COLUMNS))
+  # COLUMNS が 0 の環境（端末幅を取得できない場合）でゼロ除算しないよう既定値を置く
+  local cols=${COLUMNS:-80}
+  (( cols > 0 )) || cols=80
+  padwidth=$(($cols - (($leftwidth) + ($rightwidth)) % $cols))
 
   print -P $top_left${(r:$padwidth:: :)}$top_right
 }
@@ -181,6 +201,4 @@ if [[ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
 fi
 
 # プロンプトを再描画（初回起動時の表示を確実にする）
-if [[ -o interactive ]]; then
-  precmd  # precmd関数を明示的に実行
-fi
+precmd
