@@ -17,7 +17,9 @@ Figma の個別画面を、既存の Component Library と画面遷移図を土�
 
 画面ごとの重い読み取り（`get_design_context`/`get_metadata`）・アノテーション収集・実装・ルーティング接続は、サブエージェント `figma-screen-implementer`（`.claude/agents/figma-screen-implementer.md`, model: sonnet）に画面単位で委譲する。メインループは対象画面を決めて起動するだけにし、Figma MCP ツールを直接呼ばない。
 
-**視覚照合（`get_screenshot` によるピクセル比較）はこのスキルでは行わない。** 実装後は `figma-verify-screen` を呼ぶ（同じ画面に対して `get_screenshot` を二重に取得しないための一本化）。既定では AI による視覚照合は行われず、実装完了とブラウザ確認用 URL の案内で終了する（`figma-verify-screen` 側の既定フロー）。AI レビュー（`mode: report`）と自動修正ループ（`mode: loop`）は、ユーザーが明示的に依頼した場合のみのオプション工程。方針の詳細は `docs/ai-cost-optimization.md` §7。
+**視覚照合（`get_screenshot` によるピクセル比較）はこのスキルでは行わない。** 実装が終わったら、変更内容とブラウザ確認用 URL を報告して終了する。見た目の確認は人間がブラウザで行う。
+
+AI による視覚検証が要るとユーザーが判断した場合は、ユーザーが `figma-verify-screen` を明示的に依頼する。**このスキルから自動で呼ばない**（方針と根拠は `docs/ai-cost-optimization.md` §7）。
 
 ## 手順
 
@@ -32,7 +34,7 @@ Figma の個別画面を、既存の Component Library と画面遷移図を土�
 
    サブエージェントは metadata-first の読み取り（`get_metadata` で構造把握 → `get_design_context` は画面固有コンテンツ領域のノードに絞って1回）、Dev Mode アノテーションの収集・反映（「120分でセッション切れ→再認証画面へ」「必須項目は赤枠」等、実装上の挙動・制約・文言・バリデーション）、`src/components/organisms/` への実装、`src/App.tsx` のルーティング接続、`pnpm run lint` の実行までを行い、変更ファイル一覧・アノテーション対応状況・残課題を返す。
 
-3. **レビューと次のステップ**（メインループ）: 戻り値の `changedFiles`/`annotationChecklist`/`openQuestions` を確認する。`openQuestions` があればユーザーに確認する。問題なければ **`figma-verify-screen` を起動する**。既定では AI 視覚照合は行われず、実装完了とブラウザ確認用 URL の案内を受けて終了する（この時点で完了とみなしてよい）。ユーザーが AI レビューを明示依頼している場合のみ、`figma-verify-screen` 側でそのフローに進む。
+3. **報告**（メインループ）: 戻り値の `changedFiles`/`annotationChecklist`/`openQuestions` を確認する。`openQuestions` があればユーザーに確認する。問題なければ [`.claude/skills/shared/human-check-report.md`](../shared/human-check-report.md) の**様式C（完了案内）**に従い、変更ファイル一覧とブラウザ確認用 URL（`http://localhost:<port><route>`。port は対象プロトタイプの `vite.config.ts` が権威）を案内して終了する。
 
 ## 成果物
 
@@ -42,7 +44,7 @@ Figma の個別画面を、既存の Component Library と画面遷移図を土�
 
 ## 完了条件
 
-`figma-screen-implementer` からの要約で `lintPassed: true`、`annotationChecklist` の全項目が `applied: true`、かつ後続の `figma-verify-screen` の呼び出しが完了していること — 既定はブラウザ確認用 URL の案内まで、AI レビュー明示依頼時（`mode: report`）はそのレポート提出まで、`mode: loop` 明示時は PASS まで（以降の修正判断は人間に引き継ぐ）。
+`figma-screen-implementer` からの要約で `lintPassed: true`、かつ `annotationChecklist` の全項目が `applied: true` であること。
 
 ## 繰り返し
 
