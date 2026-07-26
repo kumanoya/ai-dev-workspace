@@ -52,7 +52,8 @@ Issue からマージまでの流れは [docs/development-flow.md](development-f
 | `/lint-fix` | ESLint の機械的なエラー修正 |
 | `/handoff` | セッションの作業状態を引き継ぎメモ化（`/clear` 前に） |
 | `/update-spec` | 実装と specs のドリフトを検知して spec 側を追随 |
-| `/figma-component-library` → `/figma-screen-flow` → `/figma-implement-screen` → `/figma-verify-screen` | Figma 連携の4段フロー（この順に使う） |
+| `/figma-component-library` → `/figma-screen-flow` → `/figma-implement-screen` | Figma 連携の3段フロー（この順に使う） |
+| `/figma-verify-screen` / `/verify-design-diff` | AI にスクショ突き合わせをさせたいときだけ人間が呼ぶ視覚検証（§4 参照） |
 
 ## 4. AI 駆動開発の指針
 
@@ -77,7 +78,7 @@ advisor は、メインの Sonnet が判断ポイントで自動的に Fable へ
 
 ### 検証の標準は「人間チェック」
 
-`figma-verify-screen` の標準は `mode: report`: AI は1回だけ指摘レポートを出し、Figma との精密な突き合わせと修正指示は人間が担う。PASS まで AI に修正を反復させる `mode: loop` は、ユーザーが明示的に指定した場合のみの例外。スクショ検証ループは最もコストの重い工程であり、かつ微妙な色差・数 px の余白差は人間の方が確実に見えるため、この分担はコストと品質の両面で合理的（根拠と運用の詳細は [docs/ai-cost-optimization.md](ai-cost-optimization.md) §7）。
+**検証は工程ではない。** 実装スキルは実装完了とブラウザ確認用 URL の案内で終わり、AI にスクショ突き合わせをさせたいときだけ人間が検証スキル（`figma-verify-screen` / `verify-design-diff`）を明示的に呼ぶ。呼んだ場合も AI は1回だけ指摘レポートを出して止まり、何を直すかの判断と修正指示は人間が担う。スクショ検証は最もコストの重い工程であり、かつ微妙な色差・数 px の余白差は人間の方が確実に見える。加えて新しいモデルは指示なしで自己検証するため、検証を完了条件に組み込むと過剰検証になる（根拠と運用の詳細は [docs/ai-cost-optimization.md](ai-cost-optimization.md) §7）。
 
 ### 停止条件の文化
 

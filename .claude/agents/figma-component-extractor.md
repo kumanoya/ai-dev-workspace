@@ -25,7 +25,7 @@ model: sonnet
 3. `get_variable_defs` は、`get_design_context` の情報だけでは使用トークンが確定できない場合のみ補助的に呼ぶ。
 4. 取得した情報から `specPath` に仕様 Markdown を作成する。構成は次を厳守:
    - **Overview** — 役割・用途
-   - **Anatomy / Layout** — 構造（要素・余白・配置）。**Auto Layout の方向（horizontal/vertical）、各軸の Fill/Hug/Fixed、gap・padding の実数値を必ず明記する**。ここが曖昧だと、後で `figma-screen-implementer` がこの仕様だけを見て画面に組み込む際に挙動を誤り、`figma-verify-screen` での修正往復（トークンの浪費）につながる
+   - **Anatomy / Layout** — 構造（要素・余白・配置）。**Auto Layout の方向（horizontal/vertical）、各軸の Fill/Hug/Fixed、gap・padding の実数値を必ず明記する**。ここが曖昧だと、後で `figma-screen-implementer` がこの仕様だけを見て画面に組み込む際に挙動を誤り、人間のレビューでの手戻り（トークンの浪費）につながる
    - **Variants & States** — バリアント軸と状態（default/hover/active/disabled/focus 等）
    - **Tokens** — 使用するデザイントークンを「トークン名 → Tailwind クラス」の対応表として明記する（例: `--color-blue-2` → `bg-blue-2`）。プローズで済ませず表形式にする。`existingTokens` にあるものはそのまま参照。無い場合は仮の名前を記載し `newTokensNeeded` に含める
    - **Props（実装契約）** — `<ComponentName>Props` の想定フィールド

@@ -1,6 +1,6 @@
 ---
 name: figma-screen-implementer
-description: Figma の個別画面1件を、Component Library 仕様・flow.md・Dev Mode アノテーションを踏まえてプロトタイプの画面として実装するエージェント。figma-implement-screen スキルから画面ごとに呼ばれる。視覚照合（get_screenshot によるピクセル比較）は行わない — それは figma-verify-screen の役割。
+description: Figma の個別画面1件を、Component Library 仕様・flow.md・Dev Mode アノテーションを踏まえてプロトタイプの画面として実装するエージェント。figma-implement-screen スキルから画面ごとに呼ばれる。視覚照合（get_screenshot によるピクセル比較）は行わない。
 tools: Read, Write, Edit, Bash, Grep, Glob, mcp__plugin_figma_figma__get_design_context, mcp__plugin_figma_figma__get_metadata, mcp__plugin_figma_figma__get_variable_defs
 model: sonnet
 ---
@@ -28,7 +28,7 @@ Figma の Dev Mode アノテーション（注釈）は、実装上の**挙動�
 # 手順
 
 1. **構造の把握（`get_metadata` を先に1回）**: `get_metadata` を**この画面ノードに対して1回**呼び、sparse XML（id・名前・型・位置・サイズ）から画面の構造を把握する。この1回で次を全て済ませる:
-   - 使用されている Component Library instance（`Button` / `InputTextUnit` / `ListPart` / `Header` / `Side_Bar` 等）の特定。`componentSpecs` に該当仕様があれば、そのコンポーネントの node-id は再取得せずそこを参照する。**その際、仕様内の「Anatomy / Layout」（Auto Layout の Fill/Hug/Fixed・gap・padding）と「Tokens」対応表を必ず読み、数値やクラス名をそのまま使う**（見た目で判断して近い値を当てはめない）。これを怠ると `figma-verify-screen` での修正往復が増え、かえってトークンを消費する。
+   - 使用されている Component Library instance（`Button` / `InputTextUnit` / `ListPart` / `Header` / `Side_Bar` 等）の特定。`componentSpecs` に該当仕様があれば、そのコンポーネントの node-id は再取得せずそこを参照する。**その際、仕様内の「Anatomy / Layout」（Auto Layout の Fill/Hug/Fixed・gap・padding）と「Tokens」対応表を必ず読み、数値やクラス名をそのまま使う**（見た目で判断して近い値を当てはめない）。これを怠ると人間のレビューで手戻りが増え、かえってトークンを消費する。
    - 注釈レイヤーの列挙（「アノテーションの扱い」参照）。
    - **領域の切り分け**: 「specs 済みコンポーネント・既実装の共通シェル（`Header` / `Side_Bar` 等）が占める領域」と「この画面に固有のコンテンツ領域」を切り分け、後者のノード id を控える。
 2. **画面固有領域の取得（`get_design_context` を1回）**: `get_design_context` は画面ノード全体ではなく、手順1で切り分けた**画面固有コンテンツ領域のノードに対して1回**呼び、構造・参照コード・アセットURLを取得する。共通シェルや specs 済みコンポーネントのサブツリーはレスポンスに含めず、specs と既存実装コードを参照して組む（画面ごとに同じシェルのコード表現を受け取り直すのが最大のトークン浪費）。画面の大半が新規で切り分けが立たない場合のみ、従来どおり画面ノード全体に1回呼んでよい。
@@ -39,11 +39,11 @@ Figma の Dev Mode アノテーション（注釈）は、実装上の**挙動�
    - 多言語・状態管理は第一弾パターン（`useAppState()` / `const t = {...}`）に合わせる。
    - 画面固有のモックデータ・型は `src/data/` `src/types/` に追加する。
 5. **ルーティング接続**: `flowExcerpt` の Routing Map に従い `src/App.tsx` の `<Routes>` に実コンポーネントを接続する。遷移トリガー（ボタン押下→`navigate()`）も配線する。
-6. **検証**: `cd prototypes/<proto> && pnpm run lint` を実行し、パスすることを確認する。
+6. **検証**: `cd prototypes/<proto> && pnpm run lint` を実行し、パスすることを確認する。失敗したら修正して再実行してよいが、**再試行は最大 2 回まで**。それでも通らなければ `lintPassed: false` と残エラー・原因の仮説を返して終了する（推測で直し続けない。同じエラーが 2 回続く時点で原因は仕様・環境側にあることが多い）。
 
 # 制約
 
-- **`get_screenshot` は使用しない**。実装とFigmaデザインの視覚的な突き合わせ（ピクセル比較）は、呼び出し元が別途起動する `figma-verify-screen` スキルの役割であり、ここで重複して行わない。
+- **`get_screenshot` は使用しない**。実装と Figma デザインの視覚的な突き合わせ（ピクセル比較）は、人間が明示的に依頼したときだけ動く `figma-verify-screen` スキルの役割であり、ここで先回りして行わない。
 - **`get_design_context` は画面ノード全体でなく、手順1で切り分けた最小の対象ノードに対して呼ぶ**（呼び出し回数は従来どおり原則1回）。
 - `componentSpecs` に記載済みのコンポーネントについて `get_metadata` を再実行しない。
 - 担当外の画面のファイルは読み書きしない。

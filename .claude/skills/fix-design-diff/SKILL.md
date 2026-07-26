@@ -1,6 +1,6 @@
 ---
 name: fix-design-diff
-description: 「この画像/PNGが正しいデザイン」「実装との相違点をリスト化したので直して」のように、参照デザイン画像（Figma からの書き出しやスクショ）と相違点リストをもとに、Figma MCP を使わずに実装を修正する。実装は design-diff-implementer（Sonnet サブエージェント）に委譲し、メインループは指示と統合のみ行う。既定フローはスクショを撮らず、実装完了とブラウザ確認用 URL の案内までで終了する。スクショ取得と AI 視覚検証（design-diff-verifier）は、ユーザーが明示的に依頼した場合のみ行うオプション工程。Figma に直接アクセスできる/してよい場合は figma-implement-screen / figma-verify-screen を使う。
+description: 「この画像/PNGが正しいデザイン」「実装との相違点をリスト化したので直して」のように、参照デザイン画像（Figma からの書き出しやスクショ）と相違点リストをもとに、Figma MCP を使わずに実装を修正する。スクショは撮らず、実装完了とブラウザ確認用 URL の案内までで終了する。AI による視覚検証が要る場合はユーザーが verify-design-diff を明示的に依頼する（このスキルからは呼ばない）。Figma に直接アクセスできる/してよい場合は figma-implement-screen を使う。
 ---
 
 # fix-design-diff — 参照画像＋相違点リストによる実装修正（Figma 非連携）
@@ -14,7 +14,7 @@ description: 「この画像/PNGが正しいデザイン」「実装との相違
 - **diffList がスコープの全て。** 修正箇所の特定は人間の役割であり、AI は渡されたリストの項目だけを直す。
 - **画像は参考資料。** リスト項目を実装するときの見本として参照するのみで、画像と実装の網羅的な差分探索・照合はしない（それはコストが掛かる割に人間の目視で足りる）。
 - **完璧を目指さない。** リストの項目がある程度解消されれば成功。判断できない項目は推測で直さずスキップし、最終報告に含める。
-- **最終チェックは人間、確認はブラウザで。** 既定フローはスクショも撮らず、実装完了とブラウザ確認用 URL の案内までで終了する。スクショ取得＋AI による視覚検証は、ユーザーが明示的に「見比べて」「検証して」等と頼んだ場合のみのオプション工程（プロトタイプ期間中はエビデンス保存も不要という運用方針。`docs/ai-cost-optimization.md` §7）。
+- **最終チェックは人間、確認はブラウザで。** このスキルはスクショを撮らず、実装完了とブラウザ確認用 URL の案内までで終了する。AI による視覚検証が要ると人間が判断した場合は、ユーザーが `verify-design-diff` を明示的に依頼する（このスキルからは呼ばない。プロトタイプ期間中はエビデンス保存も不要という運用方針。`docs/ai-cost-optimization.md` §7）。
 
 ## いつ使うか
 
@@ -22,21 +22,11 @@ description: 「この画像/PNGが正しいデザイン」「実装との相違
 - 相違点が既にリスト化されている（文言違い・色違い・要素の有無・レイアウト違い等）。
 - 明示的に「Figma MCP は使わないで」「Figma 連携は不要」と指示されたとき。
 
-Figma に直接アクセスしてよい状況（node-id 付き URL があり、都度取得してよい）では、代わりに `figma-implement-screen` / `figma-verify-screen` を使う。
+Figma に直接アクセスしてよい状況（node-id 付き URL があり、都度取得してよい）では、代わりに `figma-implement-screen` を使う。
 
-## コスト方針とモデル配分
+## 委譲の方針
 
-メインループ（このスキルを実行しているエージェント自身）は入力の整理・スクショ取得・結果の統合に徹し、重い読み取りと実装はサブエージェントに委譲する。メインループが自前で Edit/Write して実装しない（単発の小修正に見えても、必ずサブエージェント経由にする）。
-
-| 役割 | モデル | 備考 |
-| ---- | ------ | ---- |
-| メインループ | Sonnet で十分 | オーケストレーションのみ。Fable / Opus は不要 |
-| `design-diff-implementer` | sonnet（agent 定義で固定） | 画像参照＋コード修正 |
-| `design-diff-verifier` | haiku（agent 定義で固定） | オプション。明示依頼時のみ起動 |
-
-## 前提
-
-- 実装画面のスクショ取得（Playwright の前提・dev サーバーの確保・出力先規約・`verify/screenshot.mjs` が無い環境のフォールバック）は、共通リファレンス [`.claude/skills/shared/impl-screenshot.md`](../shared/impl-screenshot.md) に従う（**手順4「AI 視覚検証」でのみ** Read する。既定フロー（手順1〜3）では Read しない）。
+参照画像の読み取りと複数ファイルにまたがる修正は `design-diff-implementer`（model: sonnet で固定）に委譲する。**数回の編集で終わる修正は委譲せず自分で行う** — 小さい作業の委譲は起動コストの方が高くつく。
 
 ## 入力
 
@@ -56,9 +46,9 @@ diffList の色・数値系の項目は、可能なら具体値を含めても�
 
 `route` や `diffList` の内容から対象画面が明らかでなければ、Grep/Glob で `src/components/organisms/` 配下の候補を軽く絞り込む（詳細な読み込みは行わない。それは実装エージェントの仕事）。
 
-### 2. 実装（サブエージェントに委譲）
+### 2. 実装
 
-`design-diff-implementer` を Agent ツールで起動する。渡す情報:
+`design-diff-implementer` を Agent ツールで起動する（数回の編集で終わる規模なら委譲せず自分で直してよい）。渡す情報:
 
 - `imagePath`, `diffList`, `targetHint`, `proto`
 
@@ -66,37 +56,18 @@ diffList の色・数値系の項目は、可能なら具体値を含めても�
 
 `openQuestions` があってもここでユーザーに確認して止まらない。未対応項目として最終報告（手順3）に含める。
 
-### 3. 人間チェック用の報告（メインループ・既定フローの終点）
+### 3. 人間チェック用の報告（このスキルの終点）
 
-**既定フローの終点。スクショは撮らない。** 実装エージェントの結果を、[`.claude/skills/shared/human-check-report.md`](../shared/human-check-report.md) の**様式B（相違点対応報告）**の表 + **様式C（完了案内）**の要素に従って整形し、報告する:
+**スクショは撮らない。** 実装結果を、[`.claude/skills/shared/human-check-report.md`](../shared/human-check-report.md) の**様式B（相違点対応報告）**の表 + **様式C（完了案内）**の要素に従って整形し、報告する:
 
 - 相違点リストの各項目の対応状況（様式Bの表）
 - 変更ファイル一覧（`changedFiles`）・未対応項目（`openQuestions`）・リスト外で気づいた差異（`noticedButSkipped`）
 - **ブラウザ確認用 URL**（`http://localhost:<port><route>`。port は対象プロトタイプの `vite.config.ts` が権威。dev サーバー未起動でも、スクショ目的での起動はしない）
 - 参照画像（`imagePath`）のパス（人間が見比べる際の材料として）
 
-AI による画像照合・実装スクショの取得はここでは行わない。見た目の確認は人間がブラウザで行う。
+AI による画像照合・実装スクショの取得はこのスキルでは行わない。見た目の確認は人間がブラウザで行う。それでも AI に見比べさせたい場合は、ユーザーが `verify-design-diff` を明示的に依頼する。
 
-### 4. AI 視覚検証（オプション・明示依頼時のみ。スクショ取得もここで行う）
-
-ユーザーが「AI でも検証して」「見比べて」「verifier を回して」等と明示的に依頼した場合のみ実行する。
-
-1. [`.claude/skills/shared/impl-screenshot.md`](../shared/impl-screenshot.md) を Read し、その手順に従う（dev サーバーの確保 → 撮影 → `ok:true` / `consoleErrors:[]` の確認。コンソールエラーがあれば実装エージェントに差し戻す）。このスキルでの撮影は `--full` の1枚でよい:
-
-   ```bash
-   node verify/screenshot.mjs <route> verify/shots/<name>-impl.png --full
-   ```
-
-2. `design-diff-verifier`（model: haiku）を Agent ツールで起動する。渡す情報:
-
-   - `referenceImage`（= `imagePath`）, `implShot`, `diffList`, `sourceFiles`（= 実装エージェントの `changedFiles`）, `round`
-
-3. 返ってくる JSON の `verdict` / `diffListStatus` / `findings` を手順3の報告に統合し直して提示する。未解決や新規の critical/major があってもユーザーに提示するまでで止める（無断で自動修正ループしない）。
-
-### 5. 後片付け（メインループ）
-
-- 自分が起動した dev サーバーを停止する（起動済みを流用した場合は何もしない）。
-- `verify/shots/` の一時画像（手順4で取得した場合）は人間の目視確認が終わるまで残してよい（`.gitignore` 済み）。作業用の一時スクリプトは削除する。
+報告の末尾に1行添える: *見た目の確認はブラウザでお願いします。修正指示はまとめて1メッセージで、実値つきだと安く正確に直せます（例: 「#2 ヘッダーの gap を 16px に、#5 背景を bg-blue-2 に」）。AI にスクショ比較させたい場合は `verify-design-diff` を依頼してください。*
 
 ## 注意
 
