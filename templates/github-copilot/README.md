@@ -60,8 +60,10 @@ VS Code では `github.copilot.chat.codeGeneration.useInstructionFiles` 等の�
 | `.claude/commands/save-note.md` | `prompts/save-note.prompt.md` | `docs/notes/README.md` 不在時のフォールバック構成をインライン化 |
 | `.claude/commands/update-spec.md` | `prompts/update-spec.prompt.md` | ほぼそのまま |
 | `.claude/skills/fix-design-diff/SKILL.md` + `agents/design-diff-implementer.md` + `skills/shared/human-check-report.md` | `prompts/fix-design-diff.prompt.md` | 3ファイルを1プロンプトに統合。報告様式をインライン展開 |
-| `agents/design-diff-verifier.md` + `skills/shared/impl-screenshot.md` | `prompts/verify-design-diff.prompt.md` | 同上。JSON 出力 → 表形式の報告に変換 |
-| `.claude/skills/figma-*` / `agents/figma-*` | （移植なし） | Figma MCP 直依存のため対象外 |
+| `.claude/skills/verify-design-diff/SKILL.md` + `agents/design-diff-verifier.md` + `skills/shared/impl-screenshot.md` | `prompts/verify-design-diff.prompt.md` | 同上。JSON 出力 → 表形式の報告に変換 |
+| `.claude/skills/figma-*` / `agents/figma-*` | （移植なし） | Figma MCP 直依存のため対象外（視覚検証の `figma-verify-screen` を含む） |
+
+**検証を独立させる構造は両側で共通。** 実装（`/fix-design-diff`）は実装で完結し、視覚検証（`/verify-design-diff`）は人間が明示的に呼んだときだけ動く。実装プロンプトから検証を自動で呼ばないこと — 新しいモデルは指示なしで自己検証するため、検証を工程に組み込むと過剰検証になる（根拠は `docs/ai-cost-optimization.md` §7）。
 
 ## 既知の制約・要確認事項
 
